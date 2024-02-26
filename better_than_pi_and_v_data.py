@@ -113,7 +113,7 @@ def colapse_multiplication_and_division(equation):
 
 output_cols = 5
 folder_path = "test"
-
+equations = []
 
 for i in range(400):
     fig = plt.figure(figsize=(5, 3), dpi=30)
@@ -130,5 +130,10 @@ for i in range(400):
     ax.plot(x, y)
 
     image_path = os.path.join(folder_path, f'image_{i}.png')
+    equations.append("".join(e))
     plt.savefig(image_path, bbox_inches='tight')
-    plt.close(fig)  # Close the figure to free up memory
+    plt.close(fig)
+
+with open('equations.txt', 'w') as f:
+    for equation in equations:
+        f.write(equation + '\n')
