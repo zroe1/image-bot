@@ -141,7 +141,7 @@ folder_path = "test"
 equations = []
 
 for i in range(400):
-    fig = plt.figure(figsize=(5, 3), dpi=30)
+    fig = plt.figure(figsize=(3, 3), dpi=30)
     ax = fig.add_subplot(111)
 
     ax.set_ylim([-20, 20])
@@ -157,10 +157,10 @@ for i in range(400):
     assert len_data % 2 == 0
 
     if is_zero_undefined(e):
-        ax.plot(x[: len_data // 2], y[: len_data // 2])
-        ax.plot(x[len_data // 2 :], y[len_data // 2 :])
+        ax.plot(x[: len_data // 2], y[: len_data // 2], linewidth=4)
+        ax.plot(x[len_data // 2 :], y[len_data // 2 :], linewidth=4)
     else:
-        ax.plot(x, y)
+        ax.plot(x, y, linewidth=4)
 
     image_path = os.path.join(folder_path, f"image_{i}.png")
     equations.append("".join(e))
