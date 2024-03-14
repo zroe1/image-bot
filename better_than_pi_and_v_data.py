@@ -52,7 +52,7 @@ def get_xs_and_ys(equation):
   equation_copy = [n for n in equation]
   colapse_multiplication_and_division(equation_copy)
 
-  xs = np.arange(0.1, 10.1, 0.1)
+  xs = np.concatenate((np.arange(-10, 0, 0.01), np.arange(0.1, 10.1, 0.01)))
   ys = np.full(xs.shape, 0.0)
   ys_temp = np.array([])
 
@@ -77,7 +77,7 @@ def colapse_multiplication_and_division(equation):
   while i < len(equation):
     term = equation[i]
     if term == '*' or term == '/':
-      xs = np.arange(0.1, 10.1, 0.1)
+      xs = np.concatenate((np.arange(-10, 0, 0.01), np.arange(0.1, 10.1, 0.01)))
 
       operation = equation[i]
       first_term = equation[i - 1]
@@ -110,6 +110,40 @@ def colapse_multiplication_and_division(equation):
     i += 1
   return equation
 
+# def is_zero_undefined(equation):
+#     for idx in range(len(equation) - 1):
+#         if equation[idx] == '/' and 'x' in equation[idx + 1]:
+#             return True
+#     return False
+
+def is_zero_undefined(equation):
+    current_x_numerator = 0
+    current_x_denominator = 0
+    for i, term in enumerate(equation):
+        # print(term,  equation[i+1])
+        if i == 0 and 'x'in term:
+            current_x_numerator += 1
+            # print("N")
+        elif i != len(equation) - 1 and term == '/' and 'x' in equation[i+1]:
+            current_x_denominator += 1
+            # print("D")
+        elif i != len(equation) - 1 and 'x' in equation[i+1]:
+            current_x_numerator += 1
+            # print("N")
+        if i == len(equation) - 1 or equation[i+1] in ['+', '-']:
+            # print(current_x_denominator, current_x_numerator)
+            if current_x_denominator <= current_x_numerator:
+                current_x_denominator = 0
+                current_x_numerator = 0
+            else:
+                return True
+            
+    return False
+
+
+# eq= ['3x','/','3x','+','2x','+','9x','+','9','/','9x']
+# print(is_zero_undefined(eq))
+
 
 output_cols = 5
 folder_path = "test"
@@ -119,15 +153,28 @@ for i in range(400):
     fig = plt.figure(figsize=(5, 3), dpi=30)
     ax = fig.add_subplot(111)
     
-    ax.set_ylim([0, 50])
+    ax.set_ylim([-20, 20])
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_xticklabels([])
     ax.set_yticklabels([])
 
     e = generate_equation(6)
+    # e = ['8','*','6','/','9x','+','5','-','2','+','5x']
+    # e = ['9','-','6x', '-','6','-','9','/','6x','+','9']
+    # e = [8/4/5/4/3*8
     x, y = get_xs_and_ys(e)
-    ax.plot(x, y)
+    # ax.plot(x, y)
+    len_data = len(y)
+    assert len_data % 2 == 0
+    # print(len_data, len_data//2)
+    # print("*"*50)
+
+    if is_zero_undefined(e):
+        ax.plot(x[:len_data//2], y[:len_data//2])
+        ax.plot(x[len_data//2:], y[len_data//2:])
+    else:
+        ax.plot(x, y)
 
     image_path = os.path.join(folder_path, f'image_{i}.png')
     equations.append("".join(e))
