@@ -3,16 +3,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+
 def generate_operation():
-    """ Returns a random arithmetic operation symbol.
+    """Returns a random arithmetic operation symbol.
 
     If a random integer between 0 and 1 is 1, returns '+'. Otherwise, returns
     a random choice among '+', '-', '*', and '/'.
     """
     return random.choice(["+", "-", "*", "/"])
 
+
 def generate_equation(num_terms):
-    """ Generates an equation with 'num_terms' as coefficients or coefficients
+    """Generates an equation with 'num_terms' as coefficients or coefficients
     with 'x', interspersed with random arithmetic operations. Coefficients range
     from 1 to 10, with a 30% chance of including 'x' in each term.
 
@@ -26,123 +28,112 @@ def generate_equation(num_terms):
     for i in range(num_terms):
         coeficient = random.randint(1, 10)
         if random.randint(1, 10) > 3:
-          terms.append(str(coeficient))
+            terms.append(str(coeficient))
         else:
-          terms.append(str(coeficient) + "x")
+            terms.append(str(coeficient) + "x")
         if i < num_terms - 1:
-          terms.append(generate_operation())
+            terms.append(generate_operation())
     return terms
 
+
 def generate_simple_linear_question(num_terms):
-    """ Generates an equation with in the same manner as "generate_equation
+    """Generates an equation with in the same manner as "generate_equation
     but without only addition as an operation between terms.
     """
     terms = []
     for i in range(num_terms):
         coeficient = random.randint(1, 10)
         if random.randint(1, 10) > 4:
-          terms.append(str(coeficient))
+            terms.append(str(coeficient))
         else:
-          terms.append(str(coeficient) + "x")
+            terms.append(str(coeficient) + "x")
         if i < num_terms - 1:
-          terms.append('+')
+            terms.append("+")
     return terms
 
+
 def get_xs_and_ys(equation):
-  equation_copy = [n for n in equation]
-  colapse_multiplication_and_division(equation_copy)
+    equation_copy = [n for n in equation]
+    colapse_multiplication_and_division(equation_copy)
 
-  xs = np.concatenate((np.arange(-10, 0, 0.01), np.arange(0.1, 10.1, 0.01)))
-  ys = np.full(xs.shape, 0.0)
-  ys_temp = np.array([])
+    xs = np.concatenate((np.arange(-10, 0, 0.01), np.arange(0.1, 10.1, 0.01)))
+    ys = np.full(xs.shape, 0.0)
+    ys_temp = np.array([])
 
-  for i, num in enumerate(equation_copy):
-    if isinstance(num, np.ndarray):
-      ys_temp = num
-    elif num in ["+", "-", "*", "/"]:
-      continue
-    elif 'x' in num:
-      ys_temp = xs * float(num[0])
-    else:
-      ys_temp = np.full(xs.shape, float(num))
-    if i > 0 and equation_copy[i - 1] == '-':
-      ys -= ys_temp
-    else:
-      ys += ys_temp
+    for i, num in enumerate(equation_copy):
+        if isinstance(num, np.ndarray):
+            ys_temp = num
+        elif num in ["+", "-", "*", "/"]:
+            continue
+        elif "x" in num:
+            ys_temp = xs * float(num[0])
+        else:
+            ys_temp = np.full(xs.shape, float(num))
+        if i > 0 and equation_copy[i - 1] == "-":
+            ys -= ys_temp
+        else:
+            ys += ys_temp
 
-  return xs, ys
+    return xs, ys
+
 
 def colapse_multiplication_and_division(equation):
-  i = 0
-  while i < len(equation):
-    term = equation[i]
-    if term == '*' or term == '/':
-      xs = np.concatenate((np.arange(-10, 0, 0.01), np.arange(0.1, 10.1, 0.01)))
+    i = 0
+    while i < len(equation):
+        term = equation[i]
+        if term == "*" or term == "/":
+            xs = np.concatenate((np.arange(-10, 0, 0.01), np.arange(0.1, 10.1, 0.01)))
 
-      operation = equation[i]
-      first_term = equation[i - 1]
-      second_term = equation[i + 1]
+            operation = equation[i]
+            first_term = equation[i - 1]
+            second_term = equation[i + 1]
 
-      ys_temp_1 = np.array([])
-      ys_temp_2 = np.array([])
+            ys_temp_1 = np.array([])
+            ys_temp_2 = np.array([])
 
-      if isinstance(first_term, np.ndarray):
-        ys_temp_1 = first_term
-      elif 'x' in first_term:
-        ys_temp_1 = xs * float(first_term[0])
-      else:
-        ys_temp_1 = np.full(xs.shape, float(first_term))
+            if isinstance(first_term, np.ndarray):
+                ys_temp_1 = first_term
+            elif "x" in first_term:
+                ys_temp_1 = xs * float(first_term[0])
+            else:
+                ys_temp_1 = np.full(xs.shape, float(first_term))
 
-      if isinstance(second_term, np.ndarray):
-        ys_temp_2 = second_term
-      elif 'x' in second_term:
-        ys_temp_2 = xs * float(second_term[0])
-      else:
-        ys_temp_2 = np.full(xs.shape, float(second_term))
+            if isinstance(second_term, np.ndarray):
+                ys_temp_2 = second_term
+            elif "x" in second_term:
+                ys_temp_2 = xs * float(second_term[0])
+            else:
+                ys_temp_2 = np.full(xs.shape, float(second_term))
 
-      if operation == '*':
-        equation[i] = ys_temp_1 * ys_temp_2
-      else:
-        equation[i] = ys_temp_1 / ys_temp_2
-      equation.pop(i + 1)
-      equation.pop(i - 1)
-      i -= 1
-    i += 1
-  return equation
+            if operation == "*":
+                equation[i] = ys_temp_1 * ys_temp_2
+            else:
+                equation[i] = ys_temp_1 / ys_temp_2
+            equation.pop(i + 1)
+            equation.pop(i - 1)
+            i -= 1
+        i += 1
+    return equation
 
-# def is_zero_undefined(equation):
-#     for idx in range(len(equation) - 1):
-#         if equation[idx] == '/' and 'x' in equation[idx + 1]:
-#             return True
-#     return False
 
 def is_zero_undefined(equation):
     current_x_numerator = 0
     current_x_denominator = 0
     for i, term in enumerate(equation):
-        # print(term,  equation[i+1])
-        if i == 0 and 'x'in term:
+        if i == 0 and "x" in term:
             current_x_numerator += 1
-            # print("N")
-        elif i != len(equation) - 1 and term == '/' and 'x' in equation[i+1]:
+        elif i != len(equation) - 1 and term == "/" and "x" in equation[i + 1]:
             current_x_denominator += 1
-            # print("D")
-        elif i != len(equation) - 1 and 'x' in equation[i+1]:
+        elif i != len(equation) - 1 and "x" in equation[i + 1]:
             current_x_numerator += 1
-            # print("N")
-        if i == len(equation) - 1 or equation[i+1] in ['+', '-']:
-            # print(current_x_denominator, current_x_numerator)
+        if i == len(equation) - 1 or equation[i + 1] in ["+", "-"]:
             if current_x_denominator <= current_x_numerator:
                 current_x_denominator = 0
                 current_x_numerator = 0
             else:
                 return True
-            
+
     return False
-
-
-# eq= ['3x','/','3x','+','2x','+','9x','+','9','/','9x']
-# print(is_zero_undefined(eq))
 
 
 output_cols = 5
@@ -152,7 +143,7 @@ equations = []
 for i in range(400):
     fig = plt.figure(figsize=(5, 3), dpi=30)
     ax = fig.add_subplot(111)
-    
+
     ax.set_ylim([-20, 20])
     ax.set_xticks([])
     ax.set_yticks([])
@@ -160,27 +151,22 @@ for i in range(400):
     ax.set_yticklabels([])
 
     e = generate_equation(6)
-    # e = ['8','*','6','/','9x','+','5','-','2','+','5x']
-    # e = ['9','-','6x', '-','6','-','9','/','6x','+','9']
-    # e = [8/4/5/4/3*8
     x, y = get_xs_and_ys(e)
-    # ax.plot(x, y)
+
     len_data = len(y)
     assert len_data % 2 == 0
-    # print(len_data, len_data//2)
-    # print("*"*50)
 
     if is_zero_undefined(e):
-        ax.plot(x[:len_data//2], y[:len_data//2])
-        ax.plot(x[len_data//2:], y[len_data//2:])
+        ax.plot(x[: len_data // 2], y[: len_data // 2])
+        ax.plot(x[len_data // 2 :], y[len_data // 2 :])
     else:
         ax.plot(x, y)
 
-    image_path = os.path.join(folder_path, f'image_{i}.png')
+    image_path = os.path.join(folder_path, f"image_{i}.png")
     equations.append("".join(e))
-    plt.savefig(image_path, bbox_inches='tight')
+    plt.savefig(image_path, bbox_inches="tight")
     plt.close(fig)
 
-with open('equations.txt', 'w') as f:
+with open("equations.txt", "w") as f:
     for equation in equations:
-        f.write(equation + '\n')
+        f.write(equation + "\n")
